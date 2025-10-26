@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: tp2-ml
-        image: tassiolucas/tp2-ml:0.1
+        image: tassiolucas/tp2-ml:0.2
         volumeMounts:
         - name: model-storage
           mountPath: /data
