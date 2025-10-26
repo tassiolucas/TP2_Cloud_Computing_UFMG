@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tp2-ml-job
+  namespace: tassioalmeida
+spec:
+  template:
+    metadata:
+      labels:
+        app: tp2-ml
+    spec:
+      containers:
+      - name: tp2-ml
+        image: tassiolucas/tp2-ml:0.1
+        volumeMounts:
+        - name: model-storage
+          mountPath: /data
+      restartPolicy: Never
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: project2-pvc-tassioalmeida
+  backoffLimit: 1

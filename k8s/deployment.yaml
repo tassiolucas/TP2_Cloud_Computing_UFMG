@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tp2-api-deploy
+  namespace: tassioalmeida
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tp2-api
+  template:
+    metadata:
+      labels:
+        app: tp2-api
+    spec:
+      containers:
+      - name: api
+        image: tassiolucas/tp2-api:0.1
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: model-storage
+          mountPath: /data
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: project2-pvc-tassioalmeida
