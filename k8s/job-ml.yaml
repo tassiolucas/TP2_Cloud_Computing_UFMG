@@ -31,10 +31,10 @@ spec:
           # Limites de recursos para evitar consumir todo o nó
           resources:
             requests:
-              memory: "1Gi"
+              memory: "512Mi"
               cpu: "500m"
             limits:
-              memory: "2Gi"
+              memory: "1536Mi"  # 1.5Gi (namespace limita em 2G)
               cpu: "2000m"
           
           volumeMounts:
