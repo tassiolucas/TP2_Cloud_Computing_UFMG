@@ -1,1 +1,6 @@
 2023_spotify_ds1.csv
+.cursor/
+tests/venv/
+.cursorrules
+ml/__pycache__/train_model_improved.cpython-310.pyc
+api/__pycache__/app.cpython-310.pyc

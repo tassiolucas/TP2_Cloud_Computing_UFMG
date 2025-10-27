@@ -1,20 +1,49 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: tp2-ml-job
+  name: tp2-ml-job-v1  # Mude o nome a cada deploy para forçar recriação
   namespace: tassioalmeida
 spec:
+  # Após 3 falhas, para de tentar
+  backoffLimit: 3
+  # Remove o Job automaticamente após 1 hora de conclusão
+  ttlSecondsAfterFinished: 3600
   template:
     spec:
       containers:
         - name: tp2-ml
-          image: tassiolucas/tp2-ml:0.6
-          command: ["python3", "/app/train_model.py"]
+          image: tassiolucas/tp2-ml:0.7
+          command: ["python3", "-u", "/app/train_model.py"]
+          
+          # Variáveis de ambiente para controlar o treinamento
+          env:
+            - name: DATA_PATH
+              value: "/home/datasets/spotify/2023_spotify_ds1.csv"
+            - name: OUTPUT_PATH
+              value: "/data/model.pkl"
+            - name: MAX_PLAYLISTS
+              value: "50000"  # Limite para evitar OOM
+            - name: MIN_SUP_RATIO
+              value: "0.02"  # Mais restritivo = menos regras = menos memória
+            - name: MIN_CONF
+              value: "0.5"
+          
+          # Limites de recursos para evitar consumir todo o nó
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+          
           volumeMounts:
             - name: spotify-dataset
               mountPath: /home/datasets/spotify
+              readOnly: true  # Dataset é somente leitura
             - name: shared-data
               mountPath: /data
+      
       volumes:
         - name: spotify-dataset
           hostPath:
@@ -23,4 +52,5 @@ spec:
         - name: shared-data
           persistentVolumeClaim:
             claimName: project2-pvc-tassioalmeida
-      restartPolicy: Never
+      
+      restartPolicy: OnFailure  # Tenta novamente se falhar
