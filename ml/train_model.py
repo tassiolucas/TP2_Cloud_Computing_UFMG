@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-train_model.py
-Gera o modelo de recomendação baseado em regras de associação (FPGrowth)
-usando o dataset real do Spotify (/home/datasets/spotify/2023_spotify_ds1.csv)
-e salva o resultado em /data/model.pkl (volume compartilhado).
+train_model.py — versão final
+Treina modelo de recomendação Spotify agrupando músicas por playlist (pid).
 """
 
 import os
 import pandas as pd
 import pickle
-from ast import literal_eval
 from fpgrowth_py import fpgrowth
 
 
@@ -20,7 +17,7 @@ OUTPUT_PATH = os.getenv("OUTPUT_PATH", "/data/model.pkl")
 
 
 def load_playlist_data(data_path: str):
-    """Carrega o dataset e transforma cada playlist em lista de músicas"""
+    """Carrega dataset real e agrupa músicas por playlist (pid)."""
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"Dataset não encontrado em {data_path}")
 
@@ -28,38 +25,17 @@ def load_playlist_data(data_path: str):
     df = pd.read_csv(data_path)
     print(f"🧾 Colunas disponíveis: {list(df.columns)}")
 
-    # Tenta encontrar automaticamente uma coluna que contenha as músicas
-    song_col = None
-    for c in df.columns:
-        if 'song' in c.lower() or 'track' in c.lower():
-            song_col = c
-            break
+    if "pid" not in df.columns:
+        raise ValueError("❌ Coluna 'pid' (playlist ID) não encontrada no dataset!")
 
-    if not song_col:
-        raise ValueError("❌ Nenhuma coluna relacionada a músicas ('song' ou 'track') encontrada no dataset.")
+    # Usa track_uri ou track_name (preferência pra track_uri)
+    track_col = "track_uri" if "track_uri" in df.columns else "track_name"
+    print(f"🎵 Usando coluna '{track_col}' agrupada por 'pid'...")
 
-    print(f"🎵 Usando coluna '{song_col}' para extrair playlists...")
-
-    itemSetList = []
-    total_rows = len(df)
-    for i, entry in enumerate(df[song_col].dropna()):
-        try:
-            # Converte string JSON-like para lista real
-            songs = literal_eval(entry) if isinstance(entry, str) else entry
-            if isinstance(songs, (list, tuple)) and songs:
-                # Normaliza nomes (remove espaços, converte para str)
-                songs = [str(s).strip() for s in songs if s]
-                itemSetList.append(songs)
-        except Exception:
-            continue
-
-        if (i + 1) % 10000 == 0:
-            print(f"📦 Processadas {i+1}/{total_rows} playlists...")
+    grouped = df.groupby("pid")[track_col].apply(list)
+    itemSetList = grouped.tolist()
 
     print(f"📚 Total de playlists válidas: {len(itemSetList)}")
-    if len(itemSetList) == 0:
-        raise ValueError("❌ Nenhuma playlist válida encontrada após processamento!")
-
     return itemSetList
 
 
@@ -78,9 +54,9 @@ def main():
             ['metal', 'rock'],
         ]
 
-    print("📊 Iniciando FPGrowth (minSupRatio=0.5, minConf=0.5)...")
+    print("📊 Iniciando FPGrowth (minSupRatio=0.01, minConf=0.5)...")
     try:
-        freqItemSet, rules = fpgrowth(itemSetList, minSupRatio=0.5, minConf=0.5)
+        freqItemSet, rules = fpgrowth(itemSetList, minSupRatio=0.01, minConf=0.5)
         if not rules:
             print("⚠️ Nenhuma regra gerada, dataset pode estar muito disperso.")
     except Exception as e:
