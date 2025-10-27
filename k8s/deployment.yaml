@@ -15,9 +15,9 @@ spec:
     spec:
       containers:
       - name: api
-        image: tassiolucas/tp2-api:0.8
+        image: tassiolucas/tp2-api:0.9
         ports:
-        - containerPort: 5000
+        - containerPort: 50028
         volumeMounts:
         - name: model-storage
           mountPath: /data
