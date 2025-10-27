@@ -22,9 +22,9 @@ def recommend():
     recs = ["Imagine", "Bohemian Rhapsody"]  
     return jsonify({
         "songs": recs,
-        "version": "0.1",
+        "version": "0.2",
         "model_date": "2025-10-26"
     })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=50028)
