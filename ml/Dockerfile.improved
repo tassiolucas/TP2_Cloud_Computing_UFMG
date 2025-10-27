@@ -14,9 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 VOLUME ["/data"]
 
 # Define variáveis de ambiente padrão (podem ser sobrescritas no Kubernetes)
-ENV MAX_PLAYLISTS=50000 \
-    MIN_SUP_RATIO=0.01 \
-    MIN_CONF=0.5 \
+ENV MAX_PLAYLISTS=999999999 \
+    MIN_SUP_RATIO=0.05 \
+    MIN_CONF=0.6 \
     DATA_PATH=/home/datasets/spotify/2023_spotify_ds1.csv \
     OUTPUT_PATH=/data/model.pkl
 

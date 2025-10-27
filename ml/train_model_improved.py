@@ -16,9 +16,9 @@ from fpgrowth_py import fpgrowth
 # Caminhos configuráveis
 DATA_PATH = os.getenv("DATA_PATH", "/home/datasets/spotify/2023_spotify_ds1.csv")
 OUTPUT_PATH = os.getenv("OUTPUT_PATH", "/data/model.pkl")
-MAX_PLAYLISTS = int(os.getenv("MAX_PLAYLISTS", "50000"))  # Limita para evitar OOM
-MIN_SUP_RATIO = float(os.getenv("MIN_SUP_RATIO", "0.01"))
-MIN_CONF = float(os.getenv("MIN_CONF", "0.5"))
+MAX_PLAYLISTS = int(os.getenv("MAX_PLAYLISTS", "999999999"))
+MIN_SUP_RATIO = float(os.getenv("MIN_SUP_RATIO", "0.05"))
+MIN_CONF = float(os.getenv("MIN_CONF", "0.6"))
 
 
 def load_playlist_data(data_path: str, max_playlists=None):

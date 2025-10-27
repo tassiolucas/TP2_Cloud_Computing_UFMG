@@ -11,6 +11,17 @@ NC='\033[0m' # No Color
 NAMESPACE="tassioalmeida"
 ML_IMAGE="tassiolucas/tp2-ml:0.7"
 
+# Detecta Docker
+if command -v docker &> /dev/null; then
+    DOCKER_CMD="docker"
+elif [ -f "/Applications/Docker.app/Contents/Resources/bin/docker" ]; then
+    DOCKER_CMD="/Applications/Docker.app/Contents/Resources/bin/docker"
+else
+    echo -e "${RED}❌ Docker não encontrado!${NC}"
+    echo "Instale Docker Desktop ou adicione ao PATH"
+    exit 1
+fi
+
 echo -e "${BLUE}=================================${NC}"
 echo -e "${BLUE}🚀 TP2 Cloud Computing - Deploy${NC}"
 echo -e "${BLUE}=================================${NC}"
@@ -24,12 +35,12 @@ build_and_push() {
     PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
     cd "$PROJECT_ROOT/ml/"
     
-    docker build -f Dockerfile.improved -t $ML_IMAGE .
+    $DOCKER_CMD build -f Dockerfile.improved -t $ML_IMAGE .
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ Build successful${NC}"
         echo -e "${YELLOW}🚀 Pushing to DockerHub...${NC}"
-        docker push $ML_IMAGE
+        $DOCKER_CMD push $ML_IMAGE
         
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}✅ Push successful${NC}"

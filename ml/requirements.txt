@@ -1,3 +1,4 @@
 fpgrowth_py
 pandas
+mlxtend
 
