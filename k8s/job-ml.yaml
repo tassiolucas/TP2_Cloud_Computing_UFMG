@@ -1,23 +1,26 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: tp2-ml-job-v2
+  name: tp2-ml-job
   namespace: tassioalmeida
 spec:
   template:
-    metadata:
-      labels:
-        app: tp2-ml
     spec:
       containers:
-      - name: tp2-ml
-        image: tassiolucas/tp2-ml:0.2
-        volumeMounts:
-        - name: model-storage
-          mountPath: /data
-      restartPolicy: Never
+        - name: tp2-ml
+          image: tassiolucas/tp2-ml:0.3
+          command: ["python3", "/app/train_model.py"]
+          volumeMounts:
+            - name: spotify-dataset
+              mountPath: /home/datasets/spotify
+            - name: shared-data
+              mountPath: /data
       volumes:
-      - name: model-storage
-        persistentVolumeClaim:
-          claimName: project2-pvc-tassioalmeida
-  backoffLimit: 1
+        - name: spotify-dataset
+          hostPath:
+            path: /home/datasets/spotify  # Caminho da VM (host)
+            type: Directory
+        - name: shared-data
+          persistentVolumeClaim:
+            claimName: project2-pvc-tassioalmeida
+      restartPolicy: Never
