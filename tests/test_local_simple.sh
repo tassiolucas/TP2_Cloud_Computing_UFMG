@@ -17,7 +17,6 @@ source venv/bin/activate
 
 # Instala dependências
 echo "📥 Instalando dependências..."
-pip install --upgrade pip
 pip install -r ../ml/requirements.txt
 
 echo ""

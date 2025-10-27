@@ -17,7 +17,6 @@ source venv/bin/activate
 
 # Instala dependências
 echo "📥 Instalando dependências..."
-pip install --quiet --upgrade pip
 pip install --quiet fpgrowth_py pandas
 
 echo ""
