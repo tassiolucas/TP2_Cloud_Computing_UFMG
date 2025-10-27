@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: tp2-ml-job-v5
+  name: tp2-ml-job
   namespace: tassioalmeida
 spec:
   template:
     spec:
       containers:
         - name: tp2-ml
-          image: tassiolucas/tp2-ml:0.5
+          image: tassiolucas/tp2-ml:0.6
           command: ["python3", "/app/train_model.py"]
           volumeMounts:
             - name: spotify-dataset
@@ -18,7 +18,7 @@ spec:
       volumes:
         - name: spotify-dataset
           hostPath:
-            path: /home/datasets/spotify  # Caminho da VM (host)
+            path: /home/datasets/spotify
             type: Directory
         - name: shared-data
           persistentVolumeClaim:
