@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: tp2-ml
-          image: tassiolucas/tp2-ml:0.3
+          image: tassiolucas/tp2-ml:0.4
           command: ["python3", "/app/train_model.py"]
           volumeMounts:
             - name: spotify-dataset
