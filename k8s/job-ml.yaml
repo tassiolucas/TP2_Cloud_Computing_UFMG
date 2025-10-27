@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: tp2-ml-job-v8  # Mude o nome a cada deploy para forçar recriação
+  name: tp2-ml-job-v9  # Mude o nome a cada deploy para forçar recriação
   namespace: tassioalmeida
 spec:
   # Após 3 falhas, para de tentar
@@ -31,10 +31,10 @@ spec:
           # Limites de recursos para evitar consumir todo o nó
           resources:
             requests:
-              memory: "2Gi"
+              memory: "1Gi"
               cpu: "500m"
             limits:
-              memory: "4Gi"
+              memory: "2Gi"
               cpu: "2000m"
           
           volumeMounts:
