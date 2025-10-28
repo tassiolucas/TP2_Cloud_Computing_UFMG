@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: tassiolucas/tp2-api:0.9
+        image: tassiolucas/tp2-api:0.10
         ports:
         - containerPort: 50028
         volumeMounts:
