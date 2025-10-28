@@ -69,9 +69,25 @@ def recommend():
     # 🔹 Exemplo: usa as regras do modelo (lista de tuplas) para sugerir músicas
     recs = set()
     for rule in app.model:
-        antecedent, consequent, confidence = rule
-        if any(song in antecedent for song in songs):
-            recs.update(consequent)
+        try:
+            # Tenta desempacotar (formato esperado: tupla de 3 elementos)
+            if len(rule) == 3:
+                antecedent, consequent, confidence = rule
+            elif len(rule) == 4:
+                # Formato alternativo com support
+                antecedent, consequent, confidence, support = rule
+            else:
+                # Fallback: assume que os 2 primeiros são antecedente e consequente
+                antecedent = rule[0] if len(rule) > 0 else set()
+                consequent = rule[1] if len(rule) > 1 else set()
+            
+            # Verifica se alguma música da entrada está no antecedente
+            if any(song in antecedent for song in songs):
+                recs.update(consequent)
+        except Exception as e:
+            # Ignora regras mal formatadas
+            print(f"⚠️ Regra ignorada (formato inválido): {rule[:100]}... - Erro: {e}")
+            continue
 
     # Extrai data do modelo dos metadados se disponível
     if app.model_metadata and 'created_at' in app.model_metadata:
