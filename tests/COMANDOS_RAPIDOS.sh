@@ -46,9 +46,9 @@ build_ml() {
     echo -e "${BLUE}Versão: ${ML_VERSION}${NC}"
     echo ""
     
-    # Build
+    # Build (força plataforma linux/amd64 para compatibilidade com cluster)
     cd "$PROJECT_ROOT/ml/"
-    $DOCKER_CMD build -f Dockerfile.improved -t tassiolucas/tp2-ml:${ML_VERSION} .
+    $DOCKER_CMD build --platform linux/amd64 -f Dockerfile.improved -t tassiolucas/tp2-ml:${ML_VERSION} .
     
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Build ML failed${NC}"
@@ -79,9 +79,9 @@ build_api() {
     echo -e "${BLUE}Versão: ${API_VERSION}${NC}"
     echo ""
     
-    # Build
+    # Build (força plataforma linux/amd64 para compatibilidade com cluster)
     cd "$PROJECT_ROOT/api/"
-    $DOCKER_CMD build -t tassiolucas/tp2-api:${API_VERSION} .
+    $DOCKER_CMD build --platform linux/amd64 -t tassiolucas/tp2-api:${API_VERSION} .
     
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Build API failed${NC}"

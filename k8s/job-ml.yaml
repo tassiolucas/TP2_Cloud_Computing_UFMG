@@ -13,6 +13,7 @@ spec:
       containers:
         - name: tp2-ml
           image: tassiolucas/tp2-ml:0.9
+          imagePullPolicy: Always
           command: ["python3", "-u", "/app/train_model.py"]
           
           # Variáveis de ambiente para controlar o treinamento
