@@ -39,8 +39,19 @@ def load_playlist_data(data_path: str, max_playlists=None):
     if "pid" not in df.columns:
         raise ValueError("❌ Coluna 'pid' (playlist ID) não encontrada no dataset!")
 
-    # Usa track_uri ou track_name (preferência pra track_uri)
-    track_col = "track_uri" if "track_uri" in df.columns else "track_name"
+    # Usa track_name (nomes legíveis) ao invés de track_uri (IDs)
+    # Pode ser forçado via env var FORCE_TRACK_URI=true
+    use_uri = os.getenv("FORCE_TRACK_URI", "false").lower() == "true"
+    
+    if use_uri and "track_uri" in df.columns:
+        track_col = "track_uri"
+    elif "track_name" in df.columns:
+        track_col = "track_name"
+    elif "track_uri" in df.columns:
+        track_col = "track_uri"
+    else:
+        raise ValueError("❌ Nem 'track_name' nem 'track_uri' encontrados no dataset!")
+    
     print(f"🎵 Usando coluna '{track_col}' agrupada por 'pid'...")
 
     # Agrupa por playlist
