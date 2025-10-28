@@ -1,0 +1,112 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ml/**'
+      - 'api/**'
+      - 'k8s/**'
+      - '.github/workflows/**'
+  workflow_dispatch:  # Permite executar manualmente
+
+env:
+  DOCKER_USERNAME: tassiolucas
+
+jobs:
+  build-ml:
+    name: Build & Push ML Image
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, '[ml]') || contains(github.event.head_commit.modified, 'ml/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract ML version from YAML
+        id: ml_version
+        run: |
+          VERSION=$(grep "image: ${DOCKER_USERNAME}/tp2-ml:" k8s/job-ml.yaml | awk -F: '{print $NF}' | tr -d ' ')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "ML Version: ${VERSION}"
+      
+      - name: Build and push ML image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ml
+          file: ./ml/Dockerfile.improved
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/tp2-ml:${{ steps.ml_version.outputs.version }}
+            ${{ env.DOCKER_USERNAME }}/tp2-ml:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-api:
+    name: Build & Push API Image
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, '[api]') || contains(github.event.head_commit.modified, 'api/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract API version from YAML
+        id: api_version
+        run: |
+          VERSION=$(grep "image: ${DOCKER_USERNAME}/tp2-api:" k8s/deployment.yaml | awk -F: '{print $NF}' | tr -d ' ')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "API Version: ${VERSION}"
+      
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api
+          file: ./api/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/tp2-api:${{ steps.api_version.outputs.version }}
+            ${{ env.DOCKER_USERNAME }}/tp2-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  notify:
+    name: Notify Completion
+    runs-on: ubuntu-latest
+    needs: [build-ml, build-api]
+    if: always()
+    
+    steps:
+      - name: Summary
+        run: |
+          echo "## 🚀 CI/CD Pipeline Completo" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Imagens Docker buildadas e enviadas para DockerHub" >> $GITHUB_STEP_SUMMARY
+          echo "✅ ArgoCD vai detectar as mudanças automaticamente" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Próximos Passos" >> $GITHUB_STEP_SUMMARY
+          echo "1. ArgoCD fará sync automático em ~3 minutos" >> $GITHUB_STEP_SUMMARY
+          echo "2. Novos pods serão criados com as novas imagens" >> $GITHUB_STEP_SUMMARY
+          echo "3. Verifique os logs: \`kubectl -n tassioalmeida get pods\`" >> $GITHUB_STEP_SUMMARY
+
