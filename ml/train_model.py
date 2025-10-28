@@ -3,6 +3,8 @@
 """
 train_model.py — versão final
 Treina modelo de recomendação Spotify agrupando músicas por playlist (pid).
+
+🧪 Teste de CI/CD: Esta mudança testa o workflow automático do GitHub Actions
 """
 
 import os
