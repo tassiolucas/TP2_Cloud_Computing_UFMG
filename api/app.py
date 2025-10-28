@@ -54,6 +54,45 @@ def health():
     check_model_update()
     return jsonify({"status": "ok"})
 
+@app.route("/api/songs", methods=["GET"])
+def list_songs():
+    """Lista exemplos de músicas no modelo (primeiras 50 únicas)."""
+    check_model_update()
+    
+    if app.model is None:
+        return jsonify({
+            "error": "Modelo não carregado ainda",
+            "songs": []
+        }), 503
+    
+    # Coleta músicas únicas dos antecedentes e consequentes
+    songs_set = set()
+    for rule in app.model[:200]:  # Limita a 200 regras para não sobrecarregar
+        try:
+            if len(rule) >= 2:
+                antecedent = rule[0] if isinstance(rule[0], (set, list, tuple)) else set()
+                consequent = rule[1] if isinstance(rule[1], (set, list, tuple)) else set()
+                songs_set.update(antecedent)
+                songs_set.update(consequent)
+                
+                # Para quando tiver 50 exemplos
+                if len(songs_set) >= 50:
+                    break
+        except:
+            continue
+    
+    return jsonify({
+        "total_rules": len(app.model),
+        "example_songs": sorted(list(songs_set))[:50],
+        "note": "Primeiras 50 músicas únicas encontradas no modelo"
+    })
+
+def normalize_song(song):
+    """Normaliza nome de música para matching case-insensitive."""
+    if isinstance(song, str):
+        return song.lower().strip()
+    return song
+
 @app.route("/api/recommend", methods=["POST"])
 def recommend():
     check_model_update()
@@ -66,6 +105,9 @@ def recommend():
             "songs": []
         }), 503
 
+    # Normaliza as músicas de entrada
+    songs_normalized = [normalize_song(s) for s in songs]
+    
     # 🔹 Exemplo: usa as regras do modelo (lista de tuplas) para sugerir músicas
     recs = set()
     for rule in app.model:
@@ -81,8 +123,11 @@ def recommend():
                 antecedent = rule[0] if len(rule) > 0 else set()
                 consequent = rule[1] if len(rule) > 1 else set()
             
-            # Verifica se alguma música da entrada está no antecedente
-            if any(song in antecedent for song in songs):
+            # Normaliza antecedent e consequent para matching
+            antecedent_normalized = {normalize_song(s) for s in antecedent}
+            
+            # Verifica se alguma música da entrada está no antecedente (case-insensitive)
+            if any(song_norm in antecedent_normalized for song_norm in songs_normalized):
                 recs.update(consequent)
         except Exception as e:
             # Ignora regras mal formatadas
