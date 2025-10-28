@@ -7,6 +7,7 @@ on:
     paths:
       - 'ml/**'
       - 'api/**'
+      - 'k8s/**'
   workflow_dispatch:
     inputs:
       component:
@@ -50,16 +51,30 @@ jobs:
           else
             # Auto detect
             git diff --name-only HEAD^ HEAD > changed_files.txt
-            if grep -q "^ml/" changed_files.txt; then
-              echo "ml=true" >> $GITHUB_OUTPUT
-            else
-              echo "ml=false" >> $GITHUB_OUTPUT
+            cat changed_files.txt
+            
+            ML_CHANGED=false
+            API_CHANGED=false
+            
+            # Detecta mudanças em ml/ ou k8s/job-ml.yaml
+            if grep -q "^ml/" changed_files.txt || grep -q "^k8s/job-ml.yaml" changed_files.txt; then
+              ML_CHANGED=true
             fi
-            if grep -q "^api/" changed_files.txt; then
-              echo "api=true" >> $GITHUB_OUTPUT
-            else
-              echo "api=false" >> $GITHUB_OUTPUT
+            
+            # Detecta mudanças em api/ ou k8s/deployment.yaml
+            if grep -q "^api/" changed_files.txt || grep -q "^k8s/deployment.yaml" changed_files.txt; then
+              API_CHANGED=true
             fi
+            
+            # Se mudou outros arquivos k8s/, builda ambos por segurança
+            if grep -q "^k8s/" changed_files.txt && [ "$ML_CHANGED" = "false" ] && [ "$API_CHANGED" = "false" ]; then
+              echo "⚠️ Mudança em k8s/ detectada, buildando ambos componentes"
+              ML_CHANGED=true
+              API_CHANGED=true
+            fi
+            
+            echo "ml=$ML_CHANGED" >> $GITHUB_OUTPUT
+            echo "api=$API_CHANGED" >> $GITHUB_OUTPUT
           fi
 
   bump-ml-version:
