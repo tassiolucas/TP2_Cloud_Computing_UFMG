@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-train_model.py — versão final
+train_model_improved.py — v0.11 - Versão com controle de memória e limites
 Treina modelo de recomendação Spotify agrupando músicas por playlist (pid).
-
-🧪 Teste de CI/CD: Esta mudança testa o workflow automático do GitHub Actions
+Atualizado para CI/CD automático via GitHub Actions.
 """
 
 import os
@@ -33,7 +32,7 @@ def load_playlist_data(data_path: str, max_playlists=None):
     
     # Carrega apenas as colunas necessárias para economizar memória
     df = pd.read_csv(data_path, usecols=['pid', 'track_uri', 'track_name'], 
-                     nrows=max_playlists * 20 if max_playlists else None)
+                     nrows=max_playlists * 20 if max_playlists else None)  # Estimativa de linhas
     
     print(f"🧾 Total de linhas carregadas: {len(df)}")
     print(f"🧾 Colunas disponíveis: {list(df.columns)}")
@@ -41,8 +40,19 @@ def load_playlist_data(data_path: str, max_playlists=None):
     if "pid" not in df.columns:
         raise ValueError("❌ Coluna 'pid' (playlist ID) não encontrada no dataset!")
 
-    # Usa track_uri ou track_name (preferência pra track_uri)
-    track_col = "track_uri" if "track_uri" in df.columns else "track_name"
+    # Usa track_name (nomes legíveis) ao invés de track_uri (IDs)
+    # Pode ser forçado via env var FORCE_TRACK_URI=true
+    use_uri = os.getenv("FORCE_TRACK_URI", "false").lower() == "true"
+    
+    if use_uri and "track_uri" in df.columns:
+        track_col = "track_uri"
+    elif "track_name" in df.columns:
+        track_col = "track_name"
+    elif "track_uri" in df.columns:
+        track_col = "track_uri"
+    else:
+        raise ValueError("❌ Nem 'track_name' nem 'track_uri' encontrados no dataset!")
+    
     print(f"🎵 Usando coluna '{track_col}' agrupada por 'pid'...")
 
     # Agrupa por playlist
@@ -185,3 +195,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

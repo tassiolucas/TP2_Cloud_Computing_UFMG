@@ -1,10 +1,11 @@
+
 # Dockerfile - ML Training (Production Version)
 FROM python:3.9-slim
 
 WORKDIR /app
 
 # Copia arquivos necessários
-COPY train_model_improved.py /app/train_model.py
+COPY train_model.py /app/train_model.py
 COPY requirements.txt /app/requirements.txt
 
 # Instala dependências
