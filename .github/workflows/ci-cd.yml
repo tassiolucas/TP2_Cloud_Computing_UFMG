@@ -44,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./ml
-          file: ./ml/Dockerfile.improved
+          file: ./ml/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
