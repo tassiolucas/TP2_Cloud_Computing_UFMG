@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: tp2-ml-job-v10  # Mude o nome a cada deploy para forçar recriação
+  name: tp2-ml-job-v11  # Mude o nome a cada deploy para forçar recriação
   namespace: tassioalmeida
 spec:
   # Após 3 falhas, para de tentar
@@ -12,14 +12,14 @@ spec:
     spec:
       containers:
         - name: tp2-ml
-          image: tassiolucas/tp2-ml:0.10
+          image: tassiolucas/tp2-ml:0.11
           imagePullPolicy: Always
           command: ["python3", "-u", "/app/train_model.py"]
           
           # Variáveis de ambiente para controlar o treinamento
           env:
             - name: DATA_PATH
-              value: "/home/datasets/spotify/2023_spotify_ds1.csv"
+              value: "/home/datasets/spotify/2023_spotify_ds2.csv"
             - name: OUTPUT_PATH
               value: "/data/model.pkl"
             - name: MAX_PLAYLISTS
