@@ -19,7 +19,7 @@ spec:
           # Variáveis de ambiente para controlar o treinamento
           env:
             - name: DATA_PATH
-              value: "/home/datasets/spotify/2023_spotify_songs.csv"
+              value: "/home/datasets/spotify/2023_spotify_ds2.csv"
             - name: OUTPUT_PATH
               value: "/data/model.pkl"
             - name: MAX_PLAYLISTS
