@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-train_model_improved.py — Versão com controle de memória e limites
+train_model_improved.py — v0.11 - Versão com controle de memória e limites
 Treina modelo de recomendação Spotify agrupando músicas por playlist (pid).
+Atualizado para CI/CD automático via GitHub Actions.
 """
 
 import os
