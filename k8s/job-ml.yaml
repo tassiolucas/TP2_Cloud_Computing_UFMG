@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: tp2-ml-job  # Mude o nome a cada deploy para forçar recriação
+  name: tp2-ml-job-v12  # Mude o nome a cada deploy para forçar recriação
   namespace: tassioalmeida
 spec:
   # Após 3 falhas, para de tentar
