@@ -18,7 +18,7 @@ jobs:
   build-ml:
     name: Build & Push ML Image
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, '[ml]') || contains(github.event.head_commit.modified, 'ml/')
+    if: contains(github.event.head_commit.message, '[ml]')
     
     steps:
       - name: Checkout code
@@ -56,7 +56,7 @@ jobs:
   build-api:
     name: Build & Push API Image
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, '[api]') || contains(github.event.head_commit.modified, 'api/')
+    if: contains(github.event.head_commit.message, '[api]')
     
     steps:
       - name: Checkout code
