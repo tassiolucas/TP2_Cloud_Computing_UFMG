@@ -142,7 +142,7 @@ def recommend():
     
     return jsonify({
         "songs": list(recs) or ["Sem recomendações"],
-        "version": "1.0",
+        "version": "1.1",
         "model_date": model_date,
         "num_rules": len(app.model) if app.model else 0,
         "num_playlists": app.model_metadata.get('num_playlists', 'unknown')
